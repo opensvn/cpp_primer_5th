@@ -12,7 +12,9 @@ public:
     String(): elements(NULL), first_free(NULL), cap(NULL) {}
     String(const char *);
     String(const String&);
+    String(String &&) noexcept;
     String &operator=(const String&);
+    String &operator=(String &&) noexcept;
     ~String();
 
     void push_back(char);
@@ -88,6 +90,14 @@ String::String(const String &str)
     first_free = cap = newdata.second;
 }
 
+String::String(String &&rhs) noexcept
+    : elements(rhs.elements), first_free(rhs.first_free),
+    cap(rhs.cap)
+{
+    cout << "String(String &&)" << endl;
+    rhs.elements = rhs.first_free = rhs.cap = nullptr;
+}
+
 String &String::operator=(const String &rhs)
 {
     cout << "operator=(const String&)" << endl;
@@ -96,6 +106,19 @@ String &String::operator=(const String &rhs)
     elements = newdata.first;
     first_free = cap = newdata.second;
     return *this;
+}
+
+String &String::operator=(String &&rhs) noexcept
+{
+    cout << "operator=(String &&)" << endl;
+    if (this != &rhs)
+    {
+        free();
+        elements = rhs.elements;
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        rhs.elements = rhs.first_free = rhs.cap = nullptr;
+    }
 }
 
 String::~String()
@@ -108,6 +131,15 @@ void String::push_back(char c)
 {
     chk_n_alloc();
     alloc.construct(first_free++, c);
+}
+
+void print_stars(int num)
+{
+    for (auto i = 0; i != num; ++i)
+    {
+        cout << '*';
+    }
+    cout << endl;
 }
 
 int main()
@@ -125,10 +157,18 @@ int main()
     cout << s1.str() << endl;*/
 
     vector<String> svec;
+    print_stars(20); 
     svec.push_back("Hello");
+    print_stars(20); 
     svec.push_back("world");
+    print_stars(20); 
     svec.push_back("my name is");
+    print_stars(20); 
     svec.push_back("jianzhangyu");
+
+    print_stars(20); 
+    String s = "Nice to mee you";
+    svec.push_back(s);
 
     return 0;
 }
