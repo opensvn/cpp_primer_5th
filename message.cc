@@ -58,6 +58,7 @@ Message &Message::operator=(Message &&rhs)
         contents = std::move(rhs.contents);
         move_Folders(&rhs);
     }
+    return *this;
 }
 
 void Message::move_Folders(Message *m)

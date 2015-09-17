@@ -15,6 +15,7 @@ public:
     StrVec(const StrVec&);
     StrVec(StrVec&&) noexcept;
     StrVec &operator=(const StrVec&);
+    StrVec &operator=(StrVec &&rhs) noexcept;
     ~StrVec();
 
     void push_back(const std::string&);
@@ -88,6 +89,21 @@ StrVec &StrVec::operator=(const StrVec &rhs)
     free();
     elements = newdata.first;
     first_free = cap = newdata.second;
+    return *this;
+}
+
+StrVec &StrVec::operator=(StrVec &&rhs) noexcept
+{
+    if (this != &rhs)
+    {
+        free(); // free existing elements
+        // take over resources from rhs
+        elements = rhs.elements;
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        // leave rhs in a destructible state
+        rhs.elements = rhs.first_free = rhs.cap = nullptr;
+    }
     return *this;
 }
 
