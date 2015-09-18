@@ -74,7 +74,7 @@ StrVec::StrVec(const StrVec &s)
 }
 
 StrVec::StrVec(StrVec &&s) noexcept
-: elements(s.elements), first_free(s.first_free), cap(s.cap)
+    : elements(s.elements), first_free(s.first_free), cap(s.cap)
 {
     s.elements = s.first_free = s.cap = nullptr;
 }
