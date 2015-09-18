@@ -19,6 +19,7 @@ public:
     ~StrVec();
 
     void push_back(const std::string&);
+    void push_back(std::string &&);
     size_t size() const { return first_free - elements; }
     size_t capacity() const { return cap - elements; }
     std::string *begin() const { return elements; }
@@ -45,8 +46,16 @@ StrVec::StrVec(initializer_list<string> il)
 
 void StrVec::push_back(const string &s)
 {
+    cout << "push_back(const string&)" << endl;
     chk_n_alloc();
     alloc.construct(first_free++, s);
+}
+
+void StrVec::push_back(string &&s)
+{
+    cout << "push_back(string &&)" << endl;
+    chk_n_alloc();
+    alloc.construct(first_free++, std::move(s));
 }
 
 pair<string*, string*>
@@ -166,7 +175,8 @@ void StrVec::resize(size_t n)
 int main()
 {
     StrVec sv;
-    sv.push_back("hello");
+    string s = "Hello";
+    sv.push_back(s);
     sv.push_back("world");
 
     string *beg = sv.begin();
