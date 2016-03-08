@@ -8,6 +8,7 @@ using namespace std;
 
 class String
 {
+    friend std::ostream &operator<<(std::operator &, const String &);
 public:
     String(): elements(NULL), first_free(NULL), cap(NULL) {}
     String(const char *);
@@ -37,6 +38,12 @@ private:
     char *first_free;
     char *cap;
 };
+
+ostream &operator<<(ostream &out, const String &s)
+{
+    for (auto p = s.begin(); p != s.end(); ++p)
+        out << *p;
+}
 
 pair<char*, char*> String::alloc_n_copy(const char *b,
                                         const char *e)

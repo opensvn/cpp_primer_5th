@@ -9,7 +9,9 @@ using namespace std;
 class StrBlobPtr;
 class StrBlob
 {
-friend class StrBlobPtr;
+    friend class StrBlobPtr;
+    friend bool operator==(const StrBlob&, const StrBlob&);
+    friend bool operator!=(const StrBlob&, const StrBlob&);
 public:
     typedef vector<string>::size_type size_type;
     StrBlob();
@@ -45,6 +47,8 @@ private:
 
 class StrBlobPtr
 {
+    friend bool operator==(const StrBlobPtr&, const StrBlobPtr&);
+    friend bool operator!=(const StrBlobPtr&, const StrBlobPtr&);
 public:
     StrBlobPtr(): curr(0) {}
     StrBlobPtr(StrBlob &a, size_t sz = 0):
@@ -52,13 +56,34 @@ public:
     std::string& deref() const;
     StrBlobPtr& incr();
 
-    bool operator!=(const StrBlobPtr &rhs);
 private:
     std::shared_ptr<std::vector<std::string>>
         check(std::size_t, const std::string&) const;
     std::weak_ptr<std::vector<std::string>> wptr;
     std::size_t curr;
 };
+
+bool operator==(const StrBlob &lhs, const StrBlob &rhs)
+{
+    return *(lhs.data) == *(rhs.data);
+}
+
+bool operator!=(const StrBlob &lhs, const StrBlob &rhs)
+{
+    return !(lhs == rhs);
+}
+
+bool operator==(const StrBlobPtr &lhs, const StrBlobPtr &rhs)
+{
+    auto lp = lhs.wptr.lock();
+    auto rp = rhs.wptr.lock();
+    return *lp == *rp;
+}
+
+bool operator!=(const StrBlobPtr &lhs, const StrBlobPtr &rhs)
+{
+    return !(lhs == rhs);
+}
 
 StrBlob::StrBlob()
     : data(make_shared<vector<string>>())
@@ -140,15 +165,15 @@ StrBlobPtr& StrBlobPtr::incr()
     return *this;
 }
 
-bool StrBlobPtr::operator!=(const StrBlobPtr &rhs)
-{
-    if (this == &rhs)
-        return false;
-    if (curr != rhs.curr)
-        return true;
-    else
-        return false;
-}
+// bool StrBlobPtr::operator!=(const StrBlobPtr &rhs)
+// {
+//     if (this == &rhs)
+//         return false;
+//     if (curr != rhs.curr)
+//         return true;
+//     else
+//         return false;
+// }
 
 int main()
 {
