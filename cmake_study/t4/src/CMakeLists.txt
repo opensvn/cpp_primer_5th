@@ -1,0 +1,5 @@
+LINK_DIRECTORIES(/tmp/lib)
+INCLUDE_DIRECTORIES(/tmp/include/hello)
+ADD_EXECUTABLE(main main.c)
+#TARGET_LINK_LIBRARIES(main libhello.a)
+TARGET_LINK_LIBRARIES(main hello)
