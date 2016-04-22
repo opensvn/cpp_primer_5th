@@ -3,19 +3,15 @@
 #include <algorithm>
 using namespace std;
 
-// template <typename T>
-void print(const int& elem)
-{
+void print(const int& elem) {
     cout << elem << " ";
 }
 
-void print(const string& elem)
-{
+void print(const string& elem) {
     cout << elem << " ";
 }
 
-int main()
-{
+int main() {
     Array<int> a(5);
     for (int i = 0; i < 5; ++i)
         a[i] = i;
@@ -36,10 +32,11 @@ int main()
     for_each(&as[0], &as[5], f);
     cout << endl;
 
-    Array<int> b(0);
+    Array<int> b;
     b = a;
     for_each(&b[0], &b[5], g);
     cout << endl;
 
     return 0;
 }
+

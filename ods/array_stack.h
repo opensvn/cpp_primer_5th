@@ -9,13 +9,21 @@ template <typename T>
 class ArrayStack: public List<T> {
 public:
     ArrayStack(size_t capacity): array(capacity), num(0) {}
-    size_t size() { return num; }
-    T get(size_t i) { return array[i]; }
+
+    size_t size() {
+        return num;
+    }
+
+    T get(size_t i) {
+        return array[i];
+    }
+
     T set(size_t i, const T& x) {
         T y = array[i];
         array[i] = x;
         return y;
     }
+
     T remove(size_t i) { 
         T x = array[i];
         for (int j = i; j < num - 1; ++j)
@@ -23,6 +31,7 @@ public:
         --num;
         return x;
     }
+
     void add(size_t i, const T& x) {
         if (num + 1 > array.getLength()) resize();
         for (int j = num; j > i; --j)
@@ -36,6 +45,7 @@ public:
             std::cout << array[i] << " ";
         std::cout << std::endl;
     }
+
 private:
     void resize() {
         std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -51,3 +61,4 @@ private:
 };
 
 #endif
+

@@ -4,8 +4,9 @@
 template <typename T>
 class PriorityQueue {
 public:
-    void add(const T& x) = 0;
-    T deleteMin() = 0;
+    virtual void add(const T& x) = 0;
+    virtual T deleteMin() = 0;
 };
 
 #endif
+

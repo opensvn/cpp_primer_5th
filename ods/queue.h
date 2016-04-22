@@ -4,10 +4,11 @@
 template <typename T>
 class Queue {
 public:
-    void add(const T& x) = 0;
-    void enqueue(const T& x) = 0;
-    T remove() = 0;
-    T dequeue() = 0;
+    virtual void add(const T& x) = 0;
+    virtual void enqueue(const T& x) = 0;
+    virtual T remove() = 0;
+    virtual T dequeue() = 0;
 };
 
 #endif
+

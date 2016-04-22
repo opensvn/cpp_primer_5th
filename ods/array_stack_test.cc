@@ -3,8 +3,7 @@
 #include <algorithm>
 using namespace std;
 
-int main()
-{
+int main() {
     ArrayStack<char> asc(0);
     asc.add(0, 'b');
     asc.add(1, 'r');

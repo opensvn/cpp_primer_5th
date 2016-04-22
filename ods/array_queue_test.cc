@@ -2,8 +2,7 @@
 #include <iostream>
 using namespace std;
 
-int main()
-{
+int main() {
     ArrayQueue<int> queue;
     for (int i = 0; i < 10; ++i) {
         queue.add(i);

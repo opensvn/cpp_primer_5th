@@ -27,8 +27,6 @@ public:
         for (int i = 0; i < num; ++i) {
             std::cout << array[(front + i) % array.getLength()] << " ";
         }
-        // for (int i = 0; i < array.getLength(); ++i)
-        //     std::cout << array[i] << " ";
         std::cout << std::endl;
     }
 private:
@@ -51,3 +49,4 @@ private:
 };
 
 #endif
+

@@ -4,17 +4,14 @@
 #include <cstddef>
 
 template <typename T>
-class Array
-{
+class Array {
 public:
-    Array(size_t len)
-    {
+    Array(size_t len = 0) {
         length = len;
         a = new T[length];
     }
 
-    T& operator[](size_t i)
-    {
+    T& operator[](size_t i) {
         return a[i];
     }
 
@@ -27,15 +24,18 @@ public:
         return *this;
     }
 
-    ~Array()
-    {
-        if (a) delete[] a;
+    ~Array() {
+        if (a != NULL)
+            delete[] a;
     }
 
-    size_t getLength() { return length; }
+    size_t getLength() {
+        return length;
+    }
 private:
     T *a;
     size_t length;
 };
 
 #endif
+

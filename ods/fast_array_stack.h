@@ -29,6 +29,7 @@ public:
         array[i] = x;
         ++num;
     }
+
 private:
     void resize() {
         Array<T> b(std::max(num * 2, size_t(1)));
@@ -41,3 +42,4 @@ private:
 };
 
 #endif
+
