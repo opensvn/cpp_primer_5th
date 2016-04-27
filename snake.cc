@@ -7,15 +7,17 @@
 *******************************************************************************/
 
 #include <iostream>
+#include <cstdio>
 #include <string>
 #include <cstdlib>
 #include <ctime>
 #include <cstring>
 using namespace std;
 
-//bool operator==(const Point& lhs, const Point& rhs);
 struct Point {
     friend bool operator==(const Point& lhs, const Point& rhs);
+    friend ostream& operator<<(ostream& out, const Point& p);
+
     Point(int x = 0, int y = 0): x(x), y(y) {}
     int x;
     int y;
@@ -23,6 +25,11 @@ struct Point {
 
 bool operator==(const Point& lhs, const Point& rhs) {
     return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+ostream& operator<<(ostream& out, const Point& p) {
+    out << "Point: (" << p.x << ", " << p.y << ")";
+    return out;
 }
 
 struct SnakeBody {
@@ -34,27 +41,35 @@ struct SnakeBody {
 
 struct Snake {
     Snake(): head(NULL), tail(NULL) {}
+    ~Snake() {
+        SnakeBody* body;
+        while (head != NULL) {
+            body = head;
+            head = head->next;
+            delete body;
+        }
+    }
 
     Point move_right() {
-        Point p(head->pos.y, head->pos.x + 1);
+        Point p(head->pos.x, head->pos.y + 1);
         add_head(p);
         return remove_tail();
     }
 
     Point move_left() {
-        Point p(head->pos.y, head->pos.x - 1);
+        Point p(head->pos.x, head->pos.y - 1);
         add_head(p);
         return remove_tail();
     }
 
     Point move_up() {
-        Point p(head->pos.y - 1, head->pos.x);
+        Point p(head->pos.x - 1, head->pos.y);
         add_head(p);
         return remove_tail();
     }
 
     Point move_down() {
-        Point p(head->pos.y + 1, head->pos.x);
+        Point p(head->pos.x + 1, head->pos.y);
         add_head(p);
         return remove_tail();
     }
@@ -63,15 +78,16 @@ struct Snake {
         SnakeBody* body = new SnakeBody(pos);
         body->prev = NULL;
         body->next = head;
+        head->prev = body;
         head = body;
     }
 
     Point remove_tail() {
-        Point p;
-        p.x = tail->pos.x;
-        p.y = tail->pos.y;
+        Point p = tail->pos;
+        SnakeBody* body = tail;
         tail->prev->next = NULL;
         tail = tail->prev;
+        delete body;
         return p;
     }
 
@@ -86,13 +102,12 @@ public:
 
         Point p(row / 2, col / 2);
 
-        snake.head = new SnakeBody(Point(col/2, row/2));
-        snake.head->next = tail;
+        snake.head = new SnakeBody(p);
+        snake.head->next = NULL;
         snake.head->prev = NULL;
-        snake.tail = head;
+        snake.tail = snake.head;
 
-
-        rect[head->pos.y][head->pos.x] = '#'; // snake body represented by symbol #
+        rect[p.x][p.y] = '#'; // snake body represented by symbol '#'
 
         random_food();
 
@@ -105,21 +120,14 @@ public:
                 delete[] rect[i];
             delete[] rect;
         }
-        if (head != NULL) {
-            while (head != NULL) {
-                SnakeBody* p = head;
-                head = head->next;
-                delete p;
-            }
-        }
     }
 
     void move() {
-        std::system("clear");
+        print_rec();
 
-        int d = get_direction();
+        int direction = get_direction();
         
-        switch (d) {
+        switch (direction) {
             case RIGHT:
                 move_right(); break;
             case LEFT:
@@ -128,14 +136,12 @@ public:
                 move_up(); break;
             case DOWN:
                 move_down(); break;
-            default:
-                throw "invalid direction";
         }
     }
 
     bool alive() {
-        if (head->pos.x == 0 || head->pos.x == col_max - 1
-                || head->pos.y == 0 || head->pos.y == row_max - 1)
+        if (snake.head->pos.x == 0 || snake.head->pos.x == row_max - 1
+                || snake.head->pos.y == 0 || snake.head->pos.y == col_max - 1)
             return false;
         else
             return true;
@@ -153,11 +159,11 @@ private:
     void random_food() {
         srand(std::time(0));
         do {
-            int x = rand() % (col_max - 2) + 1; // food's x range (0, col_max - 1)
-            int y = rand() % (row_max - 2) + 1; // food's y range (0, row_max - 1)
+            int x = rand() % (row_max - 2) + 1; // food's x range (0, row_max - 1)
+            int y = rand() % (col_max - 2) + 1; // food's y range (0, col_max - 1)
 
             if (rect[x][y] != '#') {
-                rect[x][y] = '@';
+                rect[x][y] = '@'; // food represented by '@'
                 food_point.x = x;
                 food_point.y = y;
                 break;
@@ -167,65 +173,100 @@ private:
 
     int get_direction() {
         int direction = getchar();
-        if (direction == 37)
+        if (direction == 'a')
             return LEFT;
-        if (direction == 38)
+        if (direction == 'w')
             return UP;
-        if (direction == 39)
+        if (direction == 'd')
             return RIGHT;
-        if (direction == 40)
+        if (direction == 's')
             return DOWN;
+        return -1;
+    }
+
+    void print_rec() {
+        std::system("clear");
+        for (int i = 0; i < col_max; ++i)
+            cout << "-";
+        cout << endl;
+        for (int i = 1; i < row_max - 1; ++i) {
+            cout << "|";
+            for (int j = 1; j < col_max - 1; ++j) {
+                cout << rect[i][j];
+            }
+            cout << "|" << endl;
+        }
+        for (int i = 0; i < col_max; ++i)
+            cout << "-";
+        cout << endl;
     }
 
     void clear(Point p) {
-        rect[p.y][p.x] = ' ';
+        rect[p.x][p.y] = ' ';
+    }
+
+    void set_head() {
+        rect[snake.head->pos.x][snake.head->pos.y] = '#';
     }
 
     void move_right() {
-        if (can_eat(RIGHT))
-            eat_food();
-        else
-            clear(snake.move_right());
+        if (snake.head->next == NULL || snake.head->next->pos.y != snake.head->pos.y + 1) {
+            if (can_eat(RIGHT))
+                eat_food();
+            else
+                clear(snake.move_right());
+            set_head();
+        }
     }
 
     void move_left() {
-        if (can_eat(LEFT))
-            eat_food();
-        else
-            clear(snake.move_left());
+        if (snake.head->next == NULL || snake.head->next->pos.y != snake.head->pos.y - 1) {
+            if (can_eat(LEFT))
+                eat_food();
+            else
+                clear(snake.move_left());
+            set_head();
+        }
     }
 
     void move_up() {
-        if (can_eat(UP))
-            eat_food();
-        else
-            clear(snake.move_up());
+        if (snake.head->next == NULL || snake.head->next->pos.x != snake.head->pos.x - 1) {
+            if (can_eat(UP))
+                eat_food();
+            else
+                clear(snake.move_up());
+            set_head();
+        }
     }
 
     void move_down() {
-        if (can_eat(DOWN))
-            eat_food();
-        else
-            clear(snake.move_down());
+        if (snake.head->next == NULL || snake.head->next->pos.x != snake.head->pos.x + 1) {
+            if (can_eat(DOWN))
+                eat_food();
+            else
+                clear(snake.move_down());
+            set_head();
+        }
     }
 
     bool can_eat(int direction) {
-        Point head = snake->head;
+        Point head = snake.head->pos;
         switch (direction) {
             case RIGHT:
-                head.x += 1; break;
-            case LEFT:
-                head.x -= 1; break;
-            case UP:
-                head.y -= 1; break;
-            case DOWN:
                 head.y += 1; break;
+            case LEFT:
+                head.y -= 1; break;
+            case UP:
+                head.x -= 1; break;
+            case DOWN:
+                head.x += 1; break;
         }
         return head == food_point;
     }
 
     void eat_food() {
         snake.add_head(food_point);
+        random_food();
     }
 
 private:
@@ -246,11 +287,13 @@ private:
 };
 
 int main() {
-    SnakeGame game(60, 80);
+    SnakeGame game(20, 40);
 
     while (game.alive()) {
         game.move();
     }
+
+    cout << "You are dead!" << endl;
 
     return 0;
 }
