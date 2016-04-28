@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <algorithm>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
 #include <cstdlib>
 #include <ctime>
 using namespace std;
@@ -83,9 +85,9 @@ public:
     void move() {
         print_rec();
 
-        int direction = get_direction();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 
-        switch (direction) {
+        switch (d) {
             case RIGHT:
                 move_right(); break;
             case LEFT:
@@ -99,6 +101,16 @@ public:
 
     bool alive() {
         return is_alive;
+    }
+
+    void run() {
+        while (is_alive) {
+            move();
+        }
+    }
+
+    void set_direction(int direction) {
+        d = direction;
     }
 
 private:
@@ -125,19 +137,6 @@ private:
         } while (1);
     }
 
-    int get_direction() {
-        int direction = getchar();
-        if (direction == 'a')
-            return LEFT;
-        if (direction == 'w')
-            return UP;
-        if (direction == 'd')
-            return RIGHT;
-        if (direction == 's')
-            return DOWN;
-        return -1;
-    }
-
     void print_rec() {
         std::system("clear");
         for (int i = 0; i < col_max; ++i)
@@ -156,6 +155,7 @@ private:
 
     void add_head(const Point &p) {
         SnakeBody *body = new SnakeBody(p);
+
         body->prev = NULL;
         body->next = head;
         head->prev = body;
@@ -262,7 +262,7 @@ private:
 
     Point food;
     char **rect;
-    Direction d;
+    int d;
 
     bool is_alive;
 
@@ -270,12 +270,32 @@ private:
     SnakeBody *tail;
 };
 
+int get_direction() {
+    int direction = getchar();
+    if (direction == 'a')
+        return LEFT;
+    if (direction == 'w')
+        return UP;
+    if (direction == 'd')
+        return RIGHT;
+    if (direction == 's')
+        return DOWN;
+    return -1;
+}
+
 int main() {
     Snake snake(10, 20);
 
+    boost::thread thrd(boost::bind(&Snake::run, &snake));
+
     while (snake.alive()) {
-        snake.move();
+        int direction = get_direction();
+        if (direction != -1)
+            snake.set_direction(direction);
     }
+
+
+    thrd.join();
 
     cout << "You are dead!" << endl;
 
